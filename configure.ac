@@ -992,6 +992,22 @@ AC_SUBST(RAPIDCHECK_LIBS)
 AM_CONDITIONAL([ENABLE_PROPERTY_TESTS], [test x$enable_property_tests = xyes])
 
 dnl univalue check
+
+enable_property_tests=no
+if test "x$use_rapidcheck" = xauto; then
+    AC_CHECK_HEADERS([rapidcheck.h], [enable_property_tests=yes])
+elif test "x$use_rapidcheck" != xno; then
+    enable_property_tests=yes
+fi
+
+RAPIDCHECK_LIBS=
+if test "x$enable_property_tests" = xyes; then
+   RAPIDCHECK_LIBS=-lrapidcheck
+fi
+AC_SUBST(RAPIDCHECK_LIBS)
+AM_CONDITIONAL([ENABLE_PROPERTY_TESTS], [test x$enable_property_tests = xyes])
+
+dnl univalue check
 need_bundled_univalue=yes
 
 if test x$build_bitcoin_utils$build_bitcoind$bitcoin_enable_qt$use_tests$use_bench = xnonononono; then
