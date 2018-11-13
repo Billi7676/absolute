@@ -583,14 +583,9 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForCStrings(QTextCodec::codecForTr());
 #endif
 
-    Q_INIT_RESOURCE(absolute);
-    Q_INIT_RESOURCE(absolute_locale);
-
-    BitcoinApplication app(argc, argv);
-#if QT_VERSION > 0x050100
+    BitcoinApplication app(*node, argc, argv);
     // Generate high-dpi pixmaps
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
 #if QT_VERSION >= 0x050600
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif

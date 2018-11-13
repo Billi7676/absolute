@@ -45,6 +45,8 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     int titleCopyrightVSpace    = 22;
 
     float fontFactor            = 1.0;
+    float devicePixelRatio      = 1.0;
+    devicePixelRatio = static_cast<QGuiApplication*>(QCoreApplication::instance())->devicePixelRatio();
 
     // define text to place
     QString titleText       = tr(PACKAGE_NAME);
@@ -62,8 +64,12 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
 
     QString font = QApplication::font().toString();
 
-    // load the bitmap for writing some text over it
+    // create a bitmap according to device pixelratio
+    QSize splashSize(480*devicePixelRatio,320*devicePixelRatio);
     pixmap = QPixmap(splashScreenPath);
+
+    // change to HiDPI if it makes sense
+    pixmap.setDevicePixelRatio(devicePixelRatio);
 
     QPainter pixPaint(&pixmap);
     pixPaint.setPen(QColor(100,100,100));

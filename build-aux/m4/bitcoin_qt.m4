@@ -261,7 +261,7 @@ AC_DEFUN([_BITCOIN_QT_CHECK_QT5],[
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
     [[#include <QtCore>]],
     [[
-      #if QT_VERSION < 0x050000 || QT_VERSION_MAJOR < 5
+      #if QT_VERSION < 0x050200 || QT_VERSION_MAJOR < 5
       choke
       #endif
     ]])],

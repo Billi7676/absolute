@@ -51,23 +51,17 @@
 #include <QDoubleValidator>
 #include <QFileDialog>
 #include <QFont>
+#include <QFontDatabase>
+#include <QKeyEvent>
 #include <QLineEdit>
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
 #include <QMouseEvent>
 
-#if QT_VERSION < 0x050000
-#include <QUrl>
-#else
-#include <QUrlQuery>
-#endif
-
-#if QT_VERSION >= 0x50200
-#include <QFontDatabase>
-#endif
-
-static boost::filesystem::detail::utf8_codecvt_facet utf8;
+#if defined(Q_OS_MAC)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 #if defined(Q_OS_MAC)
 extern double NSAppKitVersionNumber;
@@ -93,7 +87,6 @@ QString dateTimeStr(qint64 nTime)
 
 QFont fixedPitchFont()
 {
-#if QT_VERSION >= 0x50200
     return QFontDatabase::systemFont(QFontDatabase::FixedFont);
 #else
     QFont font("Monospace");
@@ -166,7 +159,7 @@ bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out)
     QUrlQuery uriQuery(uri);
     QList<QPair<QString, QString> > items = uriQuery.queryItems();
 #endif
-    
+
     rv.fUseInstantSend = false;
     for (QList<QPair<QString, QString> >::iterator i = items.begin(); i != items.end(); i++)
     {
@@ -254,7 +247,7 @@ QString formatBitcoinURI(const SendCoinsRecipient &info)
         ret += QString("%1message=%2").arg(paramCount == 0 ? "?" : "&").arg(msg);
         paramCount++;
     }
-    
+
     if(info.fUseInstantSend)
     {
         ret += QString("%1IS=1").arg(paramCount == 0 ? "?" : "&");
@@ -924,7 +917,7 @@ QString getThemeName()
     if(!theme.isEmpty()){
         return theme;
     }
-    return QString("base");  
+    return QString("base");
 }
 
 // Open CSS when configured
@@ -936,18 +929,18 @@ QString loadStyleSheet()
     QString theme = settings.value("theme", "").toString();
 
     if(!theme.isEmpty()){
-        cssName = QString(":/css/") + theme; 
+        cssName = QString(":/css/") + theme;
     }
     else {
-        cssName = QString(":/css/base");  
+        cssName = QString(":/css/base");
         settings.setValue("theme", "base");
     }
-    
-    QFile qFile(cssName);      
+
+    QFile qFile(cssName);
     if (qFile.open(QFile::ReadOnly)) {
         styleSheet = QLatin1String(qFile.readAll());
     }
-        
+
     return styleSheet;
 }
 
@@ -1073,7 +1066,7 @@ void ClickableLabel::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_EMIT clicked(event->pos());
 }
-    
+
 void ClickableProgressBar::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_EMIT clicked(event->pos());
