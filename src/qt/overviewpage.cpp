@@ -19,7 +19,6 @@
 #include "walletmodel.h"
 
 #include "instantx.h"
-#include "darksendconfig.h"
 #include "masternode-sync.h"
 #include "privatesend-client.h"
 
@@ -38,7 +37,7 @@ class TxViewDelegate : public QAbstractItemDelegate
     Q_OBJECT
 public:
     TxViewDelegate(const PlatformStyle *_platformStyle, QObject *parent=nullptr):
-        QAbstractItemDelegate(parent), unit(BitcoinUnits::DASH),
+        QAbstractItemDelegate(), unit(BitcoinUnits::DASH),
         platformStyle(_platformStyle)
     {
 
@@ -123,6 +122,7 @@ public:
 
 OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) :
     QWidget(parent),
+    timer(nullptr),
     ui(new Ui::OverviewPage),
     clientModel(0),
     walletModel(0),
@@ -161,7 +161,7 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
     if(fLiteMode) return;
 
     // Disable any PS UI for masternode or when autobackup is disabled or failed for whatever reason
-    if(fMasterNode || nWalletBackups <= 0){
+    if(fMasternodeMode || nWalletBackups <= 0){
         DisablePrivateSendCompletely();
         if (nWalletBackups <= 0) {
             ui->labelPrivateSendEnabled->setToolTip(tr("Automatic backups are disabled, no mixing available!"));
@@ -195,7 +195,7 @@ void OverviewPage::handleOutOfSyncWarningClicks()
 
 OverviewPage::~OverviewPage()
 {
-    if(!fLiteMode && !fMasterNode) disconnect(timer, SIGNAL(timeout()), this, SLOT(privateSendStatus()));
+    if(timer) disconnect(timer, SIGNAL(timeout()), this, SLOT(privateSendStatus()));
     delete ui;
 }
 
@@ -283,18 +283,28 @@ void OverviewPage::setWalletModel(WalletModel *model)
         connect(model, SIGNAL(balanceChanged(CAmount,CAmount,CAmount,CAmount,CAmount,CAmount,CAmount)), this, SLOT(setBalance(CAmount,CAmount,CAmount,CAmount,CAmount,CAmount,CAmount)));
 
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
+        updateWatchOnlyLabels(model->haveWatchOnly());
+        connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
+
+        // explicitly update PS frame and transaction list to reflect actual settings
+        updateAdvancedPSUI(model->getOptionsModel()->getShowAdvancedPSUI());
+
+        // that's it for litemode
+        if(fLiteMode) return;
         connect(model->getOptionsModel(), SIGNAL(privateSendRoundsChanged()), this, SLOT(updatePrivateSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(privateSentAmountChanged()), this, SLOT(updatePrivateSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(advancedPSUIChanged(bool)), this, SLOT(updateAdvancedPSUI(bool)));
-        // explicitly update PS frame and transaction list to reflect actual settings
-        updateAdvancedPSUI(model->getOptionsModel()->getShowAdvancedPSUI());
 
         connect(ui->privateSendAuto, SIGNAL(clicked()), this, SLOT(privateSendAuto()));
         connect(ui->privateSendReset, SIGNAL(clicked()), this, SLOT(privateSendReset()));
         connect(ui->privateSendInfo, SIGNAL(clicked()), this, SLOT(privateSendInfo()));
         connect(ui->togglePrivateSend, SIGNAL(clicked()), this, SLOT(togglePrivateSend()));
-        updateWatchOnlyLabels(model->haveWatchOnly());
-        connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
+
+        // privatesend buttons will not react to spacebar must be clicked on
+        ui->privateSendAuto->setFocusPolicy(Qt::NoFocus);
+        ui->privateSendReset->setFocusPolicy(Qt::NoFocus);
+        ui->privateSendInfo->setFocusPolicy(Qt::NoFocus);
+        ui->togglePrivateSend->setFocusPolicy(Qt::NoFocus);
     }
 }
 
@@ -495,7 +505,7 @@ void OverviewPage::privateSendStatus()
                                 tr("We are about to create a new automatic backup for you, however "
                                    "<span style='color:red;'> you should always make sure you have backups "
                                    "saved in some safe place</span>!") + "<br><br>" +
-                                tr("Note: You turn this message off in options.");
+                                tr("Note: You can turn this message off in options.");
             ui->labelPrivateSendEnabled->setToolTip(strWarn);
             LogPrintf("OverviewPage::privateSendStatus -- Very low number of keys left since last automatic backup, warning user and trying to create new backup...\n");
             QMessageBox::warning(this, tr("PrivateSend"), strWarn, QMessageBox::Ok, QMessageBox::Ok);
@@ -547,14 +557,14 @@ void OverviewPage::privateSendStatus()
         ui->labelPrivateSendEnabled->setToolTip(strWarning);
     }
 
-    // check darksend status and unlock if needed
+    // check privatesend status and unlock if needed
     if(nBestHeight != privateSendClient.nCachedNumBlocks) {
         // Balance and number of transactions might have changed
         privateSendClient.nCachedNumBlocks = nBestHeight;
         updatePrivateSendProgress();
     }
 
-    QString strStatus = QString(privateSendClient.GetStatus().c_str());
+    QString strStatus = QString(privateSendClient.GetStatuses().c_str());
 
     QString s = tr("Last PrivateSend message:\n") + strStatus;
 
@@ -563,13 +573,7 @@ void OverviewPage::privateSendStatus()
 
     ui->labelPrivateSendLastMessage->setText(s);
 
-    if(privateSendClient.nSessionDenom == 0){
-        ui->labelSubmittedDenom->setText(tr("N/A"));
-    } else {
-        QString strDenom(CPrivateSend::GetDenominationsToString(privateSendClient.nSessionDenom).c_str());
-        ui->labelSubmittedDenom->setText(strDenom);
-    }
-
+    ui->labelSubmittedDenom->setText(QString(privateSendClient.GetSessionDenoms().c_str()));
 }
 
 void OverviewPage::privateSendAuto(){
@@ -632,18 +636,9 @@ void OverviewPage::togglePrivateSend(){
 
     if(!privateSendClient.fEnablePrivateSend){
         ui->togglePrivateSend->setText(tr("Start Mixing"));
-        privateSendClient.UnlockCoins();
+        privateSendClient.ResetPool();
     } else {
         ui->togglePrivateSend->setText(tr("Stop Mixing"));
-
-        /* show darksend configuration if client has defaults set */
-
-        if(privateSendClient.nPrivateSendAmount == 0){
-            DarksendConfig dlg(this);
-            dlg.setModel(walletModel);
-            dlg.exec();
-        }
-
     }
 }
 
@@ -658,7 +653,7 @@ void OverviewPage::SetupTransactionList(int nNumItems) {
         filter->setDynamicSortFilter(true);
         filter->setSortRole(Qt::EditRole);
         filter->setShowInactive(false);
-        filter->sort(TransactionTableModel::Status, Qt::DescendingOrder);
+        filter->sort(TransactionTableModel::Date, Qt::DescendingOrder);
 
         ui->listTransactions->setModel(filter.get());
         ui->listTransactions->setModelColumn(TransactionTableModel::ToAddress);
