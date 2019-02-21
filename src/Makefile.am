@@ -9,6 +9,29 @@ AM_CXXFLAGS = $(HARDENED_CXXFLAGS) $(ERROR_CXXFLAGS)
 AM_CPPFLAGS = $(HARDENED_CPPFLAGS)
 EXTRA_LIBRARIES =
 
+if ENABLE_STACKTRACES
+if STACKTRACE_WRAPPED_CXX_ABI
+# Wrap internal C++ ABI's so that we can attach stacktraces to exceptions
+LDFLAGS_WRAP_EXCEPTIONS = -Wl,-wrap,__cxa_allocate_exception -Wl,-wrap,__cxa_free_exception
+if TARGET_WINDOWS
+LDFLAGS_WRAP_EXCEPTIONS += -Wl,-wrap,_assert -Wl,-wrap,_wassert
+else
+LDFLAGS_WRAP_EXCEPTIONS += -Wl,-wrap,__assert_fail
+endif
+endif
+
+if RDYNAMIC_SUPPORTED
+# This gives better stacktraces
+AM_CXXFLAGS += -rdynamic
+endif
+endif
+
+if TARGET_WINDOWS
+BACKTRACE_LIB = -ldbghelp -lbacktrace
+else
+BACKTRACE_LIB = -lbacktrace
+endif
+
 if EMBEDDED_UNIVALUE
 LIBUNIVALUE = univalue/libunivalue.la
 
@@ -169,6 +192,7 @@ BITCOIN_CORE_H = \
   script/standard.h \
   script/ismine.h \
   spork.h \
+  stacktraces.h \
   streams.h \
   support/allocators/secure.h \
   support/allocators/zeroafterfree.h \
@@ -435,6 +459,7 @@ libabsolute_util_a_SOURCES = \
   compat/strnlen.cpp \
   random.cpp \
   rpc/protocol.cpp \
+  stacktraces.cpp \
   support/cleanse.cpp \
   sync.cpp \
   threadinterrupt.cpp \
@@ -459,11 +484,11 @@ libabsolute_cli_a_SOURCES = \
 nodist_libabsolute_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# absoluted binary #
-absoluted_SOURCES = absoluted.cpp
-absoluted_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-absoluted_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-absoluted_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# dashd binary #
+dashd_SOURCES = absoluted.cpp
+dashd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+dashd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+dashd_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
 absoluted_SOURCES += absoluted-res.rc
@@ -482,13 +507,13 @@ absoluted_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-absoluted_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS)
+dashd_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS)
 
-# absolute-cli binary #
-absolute_cli_SOURCES = absolute-cli.cpp
-absolute_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-absolute_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-absolute_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# dash-cli binary #
+dash_cli_SOURCES = absolute-cli.cpp
+dash_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+dash_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+dash_cli_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
 absolute_cli_SOURCES += absolute-cli-res.rc
@@ -499,14 +524,14 @@ absolute_cli_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO)
-absolute_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
+dash_cli_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
 #
 
-# absolute-tx binary #
-absolute_tx_SOURCES = absolute-tx.cpp
-absolute_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-absolute_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-absolute_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# dash-tx binary #
+dash_tx_SOURCES = absolute-tx.cpp
+dash_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+dash_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+dash_tx_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
 absolute_tx_SOURCES += absolute-tx-res.rc
@@ -520,7 +545,7 @@ absolute_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-absolute_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(BLS_LIBS)
+absolute_tx_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(CRYPTO_LIBS) $(BLS_LIBS)
 #
 
 # absoluteconsensus library #

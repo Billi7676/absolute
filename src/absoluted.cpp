@@ -21,6 +21,7 @@
 #include "httpserver.h"
 #include "httprpc.h"
 #include "utilstrencodings.h"
+#include "stacktraces.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
@@ -181,11 +182,8 @@ bool AppInit(int argc, char* argv[])
         }
 
         fRet = AppInitMain(threadGroup, scheduler);
-    }
-    catch (const std::exception& e) {
-        PrintExceptionContinue(&e, "AppInit()");
     } catch (...) {
-        PrintExceptionContinue(NULL, "AppInit()");
+        PrintExceptionContinue(std::current_exception(), "AppInit()");
     }
 
     if (!fRet)
@@ -204,6 +202,9 @@ bool AppInit(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
+    RegisterPrettyTerminateHander();
+    RegisterPrettySignalHandlers();
+
     SetupEnvironment();
 
     // Connect absoluted signal handlers
