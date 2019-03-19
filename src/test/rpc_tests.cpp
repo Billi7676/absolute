@@ -343,6 +343,7 @@ BOOST_AUTO_TEST_CASE(rpc_convert_values_generatetoaddress)
     BOOST_CHECK_EQUAL(result[1].get_str(), "yeuGPR63dHk98cSMZetDhUFTyvJen6z7s9");
     BOOST_CHECK_EQUAL(result[2].get_int(), 9);
 }
+#endif // ENABLE_MINER
 
 BOOST_AUTO_TEST_CASE(rpc_sentinel_ping)
 {
