@@ -82,6 +82,7 @@ libconftest.dylib*
 Makefile
 absolute-qt
 Absolute-Qt.app
+!/depends/Makefile
 
 # Unit-tests
 Makefile.test
