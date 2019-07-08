@@ -27,7 +27,7 @@
 
 #include <openssl/ssl.h>
 
-#if defined(QT_STATICPLUGIN) && QT_VERSION < 0x050000
+#if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
 #if defined(QT_QPA_PLATFORM_MINIMAL)
 Q_IMPORT_PLUGIN(QMinimalIntegrationPlugin);
@@ -78,13 +78,6 @@ int main(int argc, char *argv[])
     if (QTest::qExec(&test5) != 0)
         fInvalid = true;
     ECC_Stop();
-
-#ifdef ENABLE_WALLET
-    WalletTests test6;
-    if (QTest::qExec(&test6) != 0) {
-        fInvalid = true;
-    }
-#endif
 
     return fInvalid;
 }
