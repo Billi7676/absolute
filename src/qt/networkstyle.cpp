@@ -86,7 +86,8 @@ NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift,
         rotateColors(splashImageImg, iconColorHueShift, iconColorSaturationReduction);
 
         //convert back to QPixmap
-        pixmap.convertFromImage(img);
+        appIconPixmap.convertFromImage(appIconImg);
+        splashImagePixmap.convertFromImage(splashImageImg);
     }
 
     appIcon             = QIcon(appIconPixmap);
