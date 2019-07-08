@@ -150,8 +150,8 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *_platformStyle, const NetworkStyle *
 #endif
     setWindowTitle(windowTitle);
 
-    rpcConsole = new RPCConsole(node, _platformStyle, 0);
-    helpMessageDialog = new HelpMessageDialog(node, this, false);
+    rpcConsole = new RPCConsole(_platformStyle, 0);
+    helpMessageDialog = new HelpMessageDialog(this, HelpMessageDialog::cmdline);
 #ifdef ENABLE_WALLET
     if(enableWallet)
     {
