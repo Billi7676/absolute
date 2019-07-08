@@ -703,11 +703,7 @@ int main(int argc, char *argv[])
     try
     {
         app.createWindow(networkStyle.data());
-        // Perform base initialization before spinning up initialization/shutdown thread
-        // This is acceptable because this function only contains steps that are quick to execute,
-        // so the GUI thread won't be held up.
-        if (node->baseInitialize()) {
-            app.requestInitialize();
+	app.requestInitialize();
 #if defined(Q_OS_WIN)
             WinShutdownMonitor::registerShutdownBlockReason(QObject::tr("%1 didn't yet exit safely...").arg(QObject::tr(PACKAGE_NAME)), (HWND)app.getMainWinId());
 #endif
