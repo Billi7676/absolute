@@ -47,7 +47,7 @@ qt_test_test_absolute_qt_SOURCES = \
   $(TEST_ABSOLUTE_CPP) \
   $(TEST_ABSOLUTE_H)
 if ENABLE_WALLET
-qt_test_test_absolute_qt_SOURCES += \
+  qt_test_test_absolute_qt_SOURCES += \
   qt/test/paymentservertests.cpp \
   qt/test/wallettests.cpp
 endif
