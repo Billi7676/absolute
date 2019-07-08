@@ -107,7 +107,7 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
 
     addressWidget = new QLineEdit(this);
     addressWidget->setPlaceholderText(tr("Enter address or label to search"));
-    hlayout->addWidget(search_widget);
+    hlayout->addWidget(addressWidget);
 
     amountWidget = new QLineEdit(this);
     amountWidget->setPlaceholderText(tr("Min amount"));
