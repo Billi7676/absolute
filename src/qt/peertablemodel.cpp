@@ -56,11 +56,12 @@ public:
     {
         {
             cachedNodeStats.clear();
+            std::vector<CNodeStats> vstats;
+            if(g_connman)
+                g_connman->GetNodeStats(vstats);
 
-            interfaces::Node::NodesStats nodes_stats;
-            node.getNodesStats(nodes_stats);
-            cachedNodeStats.reserve(nodes_stats.size());
-            for (auto& node_stats : nodes_stats)
+            cachedNodeStats.reserve(vstats.size());
+            Q_FOREACH (const CNodeStats& nodestats, vstats)
             {
                 CNodeCombinedStats stats;
                 stats.nodeStateStats.nMisbehavior = 0;
