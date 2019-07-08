@@ -56,8 +56,8 @@ public:
         for (const auto& entry : banMap)
         {
             CCombinedBan banEntry;
-            banEntry.subnet = (*it).first;
-            banEntry.banEntry = (*it).second;
+            banEntry.subnet = entry.first;
+            banEntry.banEntry = entry.second;
             cachedBanlist.append(banEntry);
         }
 
