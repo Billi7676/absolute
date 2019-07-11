@@ -484,11 +484,11 @@ libabsolute_cli_a_SOURCES = \
 nodist_libabsolute_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# dashd binary #
-dashd_SOURCES = absoluted.cpp
-dashd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-dashd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dashd_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# absoluted binary #
+absoluted_SOURCES = absoluted.cpp
+absoluted_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+absoluted_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+absoluted_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
 absoluted_SOURCES += absoluted-res.rc
@@ -507,13 +507,13 @@ absoluted_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-dashd_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS)
+absoluted_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS)
 
-# dash-cli binary #
-dash_cli_SOURCES = absolute-cli.cpp
-dash_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-dash_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dash_cli_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# absolute-cli binary #
+absolute_cli_SOURCES = absolute-cli.cpp
+absolute_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+absolute_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+absolute_cli_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
 absolute_cli_SOURCES += absolute-cli-res.rc
@@ -524,14 +524,14 @@ absolute_cli_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO)
-dash_cli_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
+absolute_cli_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
 #
 
-# dash-tx binary #
-dash_tx_SOURCES = absolute-tx.cpp
-dash_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-dash_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dash_tx_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# absolute-tx binary #
+absolute_tx_SOURCES = absolute-tx.cpp
+absolute_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+absolute_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+absolute_tx_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
 absolute_tx_SOURCES += absolute-tx-res.rc

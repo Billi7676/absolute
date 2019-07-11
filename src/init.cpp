@@ -2012,7 +2012,7 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
         }
     }
 
-    // ********************************************************* Step 11c: schedule Dash-specific tasks
+    // ********************************************************* Step 11c: schedule Absolue-specific tasks
 
     if (!fLiteMode) {
         scheduler.scheduleEvery(boost::bind(&CNetFulfilledRequestManager::DoMaintenance, boost::ref(netfulfilledman)), 60);
