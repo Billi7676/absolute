@@ -88,15 +88,7 @@ QString dateTimeStr(qint64 nTime)
 QFont fixedPitchFont()
 {
     return QFontDatabase::systemFont(QFontDatabase::FixedFont);
-#else
-    QFont font("Monospace");
-#if QT_VERSION >= 0x040800
-    font.setStyleHint(QFont::Monospace);
-#else
-    font.setStyleHint(QFont::TypeWriter);
-#endif
-    return font;
-#endif
+
 }
 
 // Just some dummy data to generate an convincing random-looking (but consistent) address
