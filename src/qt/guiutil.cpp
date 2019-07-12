@@ -60,22 +60,7 @@
 #include <QMouseEvent>
 #include <QUrlQuery>
 
-#if defined(Q_OS_MAC)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
-
 static boost::filesystem::detail::utf8_codecvt_facet utf8;
-
-#if defined(Q_OS_MAC)
-extern double NSAppKitVersionNumber;
-#if !defined(NSAppKitVersionNumber10_8)
-#define NSAppKitVersionNumber10_8 1187
-#endif
-#if !defined(NSAppKitVersionNumber10_9)
-#define NSAppKitVersionNumber10_9 1265
-#endif
-#endif
 
 #if defined(Q_OS_MAC)
 #pragma GCC diagnostic push
