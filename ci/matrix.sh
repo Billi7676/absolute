@@ -56,7 +56,7 @@ elif [ "$BUILD_TARGET" = "linux32" ]; then
   export HOST=i686-pc-linux-gnu
   export PACKAGES="g++-multilib bc python3-zmq"
 
-  export BITCOIN_CONFIG="--enable-zmq --enable-glibc-back-compat --enable-reduce-exports --enable-stacktraces LDFLAGS=-static-libstdc++"
+  export BITCOIN_CONFIG="--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --enable-stacktraces LDFLAGS=-static-libstdc++"
   export USE_SHELL="/bin/dash"
   export PYZMQ=true
   export RUN_TESTS=true
@@ -64,8 +64,8 @@ elif [ "$BUILD_TARGET" = "linux64" ]; then
   export HOST=x86_64-unknown-linux-gnu
   export PACKAGES="bc python3-zmq"
   export DEP_OPTS="NO_UPNP=1 DEBUG=1"
-  export BITCOIN_CONFIG="--enable-zmq --enable-glibc-back-compat --enable-reduce-exports --enable-stacktraces"
-  export CPPFLAGS="-DDEBUG_LOCKORDER -DENABLE_DASH_DEBUG"
+  export BITCOIN_CONFIG="--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --enable-stacktraces --enable-debug CXXFLAGS=\"-g0 -O2\""
+  export CPPFLAGS="-DDEBUG_LOCKORDER -DENABLE_ABSOLUTE_DEBUG"
   export PYZMQ=true
   export RUN_TESTS=true
 elif [ "$BUILD_TARGET" = "linux64_nowallet" ]; then
