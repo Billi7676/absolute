@@ -137,6 +137,15 @@ BITCOIN_TESTS =\
   test/univalue_tests.cpp \
   test/util_tests.cpp
 
+if ENABLE_PROPERTY_TESTS
+BITCOIN_TESTS += \
+  test/key_properties.cpp
+
+BITCOIN_TEST_SUITE += \
+  test/gen/crypto_gen.cpp \
+  test/gen/crypto_gen.h
+endif
+
 if ENABLE_WALLET
 BITCOIN_TESTS += \
   wallet/test/wallet_test_fixture.cpp \

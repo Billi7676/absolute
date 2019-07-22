@@ -9,8 +9,9 @@ RUN apt-get update && apt-get install -y git
 RUN apt-get update && apt-get install -y g++
 RUN apt-get update && apt-get install -y autotools-dev libtool m4 automake autoconf pkg-config
 RUN apt-get update && apt-get install -y zlib1g-dev libssl1.0-dev curl ccache bsdmainutils cmake
-RUN apt-get update && apt-get install -y python3 python3-dev
+RUN apt-get update && apt-get install -y python3 python3-dev python3-zmq 
 RUN apt-get update && apt-get install -y python3-pip
+RUN apt-get update && apt-get install -y qtbase5-dev qttools5-dev-tools protobuf-compiler libdbus-1-dev libharfbuzz-dev libprotobuf-dev
 
 # Python stuff
 RUN pip3 install pyzmq # really needed?
