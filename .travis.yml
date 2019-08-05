@@ -102,7 +102,7 @@ before_cache:
 
 before_install:
   - travis_retry travis_apt_get_update
-  - travis_retry sudo apt-get -yq --no-install-suggests --no-install-recommends install docker-ce realpath
+  - travis_retry sudo apt-get -yq --no-install-suggests --no-install-recommends install docker-ce
 
 install:
     # Our scripts try to be Travis agnostic
