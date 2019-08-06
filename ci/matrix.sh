@@ -28,7 +28,7 @@ export DOCKER_RUN_IN_BUILDER="docker run -t --rm -w $SRC_DIR $DOCKER_RUN_ARGS $B
 export GOAL="install"
 export SDK_URL=${SDK_URL:-https://bitcoincore.org/depends-sources/sdks}
 export PYTHON_DEBUG=1
-export MAKEJOBS="-j7"
+export MAKEJOBS="-j4"
 
 if [ "$BUILD_TARGET" = "arm-linux" ]; then
   export HOST=arm-linux-gnueabihf
@@ -56,7 +56,7 @@ elif [ "$BUILD_TARGET" = "linux64" ]; then
   export PACKAGES="bc python3-zmq"
   export DEP_OPTS="NO_UPNP=1 DEBUG=1"
   export BITCOIN_CONFIG="--enable-zmq --enable-glibc-back-compat --enable-reduce-exports --enable-stacktraces"
-  export CPPFLAGS="-DDEBUG_LOCKORDER -DENABLE_DASH_DEBUG"
+  export CPPFLAGS="-DDEBUG_LOCKORDER -DENABLE_ABSOLUTE_DEBUG"
   export PYZMQ=true
   export RUN_TESTS=true
 elif [ "$BUILD_TARGET" = "linux64_nowallet" ]; then
