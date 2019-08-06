@@ -70,8 +70,6 @@ jobs:
     - <<: *builddepends
       env: BUILD_TARGET=arm-linux
     - <<: *builddepends
-      env: BUILD_TARGET=win32
-    - <<: *builddepends
       env: BUILD_TARGET=win64
     - <<: *builddepends
       env: BUILD_TARGET=linux32
@@ -85,8 +83,6 @@ jobs:
     - <<: *buildsrc
       env: BUILD_TARGET=arm-linux
     - <<: *buildsrc
-      env: BUILD_TARGET=win32
-    - <<: *buildsrc
       env: BUILD_TARGET=win64
     - <<: *buildsrc
       env: BUILD_TARGET=linux32
@@ -97,8 +93,6 @@ jobs:
     - <<: *buildsrc
       env: BUILD_TARGET=mac
     # run tests (no tests for arm-linux and mac)
-    - <<: *runtests
-      env: BUILD_TARGET=win32
     - <<: *runtests
       env: BUILD_TARGET=win64
     - <<: *runtests
